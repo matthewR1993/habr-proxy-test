@@ -4,6 +4,8 @@ Tested for python 3.5, linux ubuntu.
 
 Run tests:
 ```sh
+# activate virtualenv and run:
+pip3 install -r requirements.txt 
 python3 -m unittest discover
 ```
 
