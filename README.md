@@ -13,10 +13,6 @@ Start with virtualenv:
 pip3 install -r requirements.txt 
 gunicorn -w 4 -b 0.0.0.0:8080 server:app
 ```
-or
-```sh
-./startup_venv.sh
-```
 
 Start with docker container:
 ```sh
