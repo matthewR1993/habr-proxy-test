@@ -6,9 +6,9 @@ import proxy.converter as conv
 
 class TestTransformRequestFunc(unittest.TestCase):
     def test_common(self):
-        input = b'''<html><body><div>looooong 
-        \xd1\x81\xd0\xb0\xd0\xbc\xd0\xbe\xd0\xb4\xd1\x83\xd1\x80</div></body></html>'''
-        output = '<html>\n <body>\n  <div>\n   looooong&trade; \n        самодур&trade;\n  </div>\n </body>\n</html>'
+        input = b'''<html><body><div>looooong mini 
+        \xd0\xbf\xd0\xbe\xd0\xb3\xd0\xbe\xd0\xb4\xd0\xb0</div></body></html>'''
+        output = '<html>\n <body>\n  <div>\n   looooong mini \n        погода&trade;\n  </div>\n </body>\n</html>'
         self.assertEqual(conv.transform_request(input), output)
 
     def test_modify_http_urls(self):
@@ -23,44 +23,69 @@ class TestTransformRequestFunc(unittest.TestCase):
 
     def test_skipping_tags(self):
         input = b'''<html><body><script>var longname = 5;</script><style>longword</style>
-        <code>longword</code><link>another</link></body></html>'''
+        <code>longword</code></body></html>'''
         output = '<html>\n <body>\n  <script>\n   var longname = 5;\n  </script>\n  <style>\n   longword\n' \
-                 '  </style>\n  <code>\n   longword\n  </code>\n  <link/>\n  another&trade;\n </body>\n</html>'
+                 '  </style>\n  <code>\n   longword\n  </code>\n </body>\n</html>'
         self.assertEqual(conv.transform_request(input), output)
 
     def test_nested_tags(self):
-        input = b'''<html><body><p>innercontent<p>nestedstuff</p></p></body></html>'''
-        output = '<html>\n <body>\n  <p>\n   innercontent&trade;\n  </p>\n  <p>\n   ' \
-                 'nestedstuff&trade;\n  </p>\n </body>\n</html>'
+        input = b'''<html><body><p>conten word<p>nested</p></p></body></html>'''
+        output = '<html>\n <body>\n  <p>\n   conten&trade; word\n  </p>\n  <p>\n   ' \
+                 'nested&trade;\n  </p>\n </body>\n</html>'
         self.assertEqual(conv.transform_request(input), output)
 
 
 class TestAddLabelsFunc(unittest.TestCase):
+    def test_empty(self):
+        input = u''
+        output = u''
+        self.assertEqual(conv.add_labels(input), output)
+
+    def test_only_space(self):
+        input = u' '
+        output = u' '
+        self.assertEqual(conv.add_labels(input), output)
+
+    def test_one_suitable_word(self):
+        input = u'погода'
+        output = u'погода&trade;'
+        self.assertEqual(conv.add_labels(input), output)
+
+    def test_one_little_word(self):
+        input = u'дом'
+        output = u'дом'
+        self.assertEqual(conv.add_labels(input), output)
+
+    def test_one_big_word(self):
+        input = u'сатисфакция'
+        output = u'сатисфакция'
+        self.assertEqual(conv.add_labels(input), output)
+
     def test_basic(self):
-        input = u'Тут находится текст для базового теста here is a text for basic test'
-        output = u'Тут находится&trade; текст для базового&trade; теста here is a text for basic test'
+        input = u'тут текстт here is a target toolong'
+        output = u'тут текстт&trade; here is a target&trade; toolong'
         self.assertEqual(conv.add_labels(input), output)
 
     def test_corner_spaces(self):
         input = u' Starting and ending with long words with spaces '
-        output = u' Starting&trade; and ending&trade; with long words with spaces&trade; '
+        output = u' Starting and ending&trade; with long words with spaces&trade; '
         self.assertEqual(conv.add_labels(input), output)
 
-    def test_last_long(self):
-        input = u'В конце длинное словововоло'
-        output = u'В конце длинное&trade; словововоло&trade;'
+    def test_last_word(self):
+        input = u'В конце длинно сслово'
+        output = u'В конце длинно&trade; сслово&trade;'
         self.assertEqual(conv.add_labels(input), output)
 
-    def test_first_log(self):
-        input = u'начинается длинным словом и все'
-        output = u'начинается&trade; длинным&trade; словом&trade; и все'
+    def test_first_word(self):
+        input = u'начало с длиным&trade; словом и все'
+        output = u'начало&trade; с длиным&trade; словом&trade; и все'
         self.assertEqual(conv.add_labels(input), output)
 
     def test_avoiding_punctuation(self):
-        input = u'''знаки препинания, как и другая орфоргафия 
+        input = u'''знаки препя,&trade; как и другая орфоргафия 
         не учитываются! nobody gives a shit!'''
-        output = u'''знаки препинания,&trade; как и другая&trade; орфоргафия&trade; 
-        не учитываются!&trade; nobody&trade; gives a shit!'''
+        output = u'''знаки препя,&trade; как и другая&trade; орфоргафия 
+        не учитываются! nobody&trade; gives a shit!'''
         self.assertEqual(conv.add_labels(input), output)
 
 

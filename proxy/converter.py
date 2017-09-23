@@ -3,8 +3,8 @@ from bs4 import Comment
 import html
 
 
-# This function adds label '&trade; ' (TM) to all words which length more than 'min_size'
-def add_labels(string, min_size=6, label='&trade;'):
+# This function adds label '&trade; ' (TM) to all words with 'size'
+def add_labels(string, size=6, label='&trade;'):
     string = string + ' '  # add additional space to the end
     counter = 0
     changes = []  # {'index': 1, 'size': 6} - index of start and length of the word
@@ -12,7 +12,7 @@ def add_labels(string, min_size=6, label='&trade;'):
         if string[i] != ' ':
             counter += 1
         else:
-            if counter >= min_size:
+            if counter == size:
                 changes.append({'index': i - counter, 'size': counter})
                 counter = 0
             else:
