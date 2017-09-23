@@ -4,13 +4,13 @@ Tested for python 3.5, linux ubuntu.
 
 Run tests:
 ```sh
-source ENV/bin/activate
 python3 -m unittest discover
 ```
 
 Start with virtualenv:
 ```sh
-source ENV/bin/activate
+# activate virtualenv and run:
+pip3 install -r requirements.txt 
 gunicorn -w 4 -b 0.0.0.0:8080 server:app
 ```
 or
